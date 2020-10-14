@@ -1,0 +1,71 @@
+<html>
+
+<head>
+    <style>
+        html {
+            background-color: #281A0A;
+            color: whitesmoke;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        span {
+            display: block;
+            padding-top: 2px;
+        }
+    </style>
+    <script>
+        window.addEventListener("load", onLoad)
+        let en = true;
+        let timeout = 10000;
+        let line = 0
+        let main;
+        function onLoad() {
+            main = document.getElementById("main");
+            update();
+        }
+        function onTransfertCompleted(e) {
+            console.log("Request sent");
+            let parser = new DOMParser();
+            let xmlDoc = parser.parseFromString(this.responseText, "text/html");   
+            let array = xmlDoc.getElementsByTagName("span");
+            console.log(this.responseText + "\t" + this)
+            if(array.length > 0) {
+                for (let i = 0; i < array.length; i++) {
+                    main.appendChild(array[i]);
+                    console.log(array[i]);
+                }
+                console.log("line before " + line)
+                line = line + array.length;
+                console.log("Updated");
+                console.log("line after " + line)
+            }
+            else {
+                console.log("Nothing to update");
+            }
+            if(en) {
+                setTimeout(update, timeout);
+            }
+        }
+        function update() {
+            let xhr = new XMLHttpRequest();
+            let uri = 'http://vs-c.ddns.net:6666/log/displayLog.php?line=' + line;
+            console.log(uri);
+            xhr.open('GET', uri, true);
+            // xhr.responseType = 'document';
+            // xhr.setRequestHeader('Content-Type',  'text/xml');
+            // xhr.overrideMimeType('application/xml');
+            // xhr.overrideMimeType('text/xml');
+            xhr.addEventListener("load", onTransfertCompleted);
+            xhr.send();
+            console.log("Sending the request..");
+        }
+    </script>
+
+</head>
+
+<body>
+<div id=main>
+
+</div>
+</body>
+
+</html>
